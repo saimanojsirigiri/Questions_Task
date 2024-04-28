@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Page</title>
+    <style>
+      li {
+        list-style: none;
+        text-align: justify;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Messages</h1>
+    <ul id="messages"></ul>
+    <script>
+      const ws = new WebSocket("ws://localhost:8080");
+
+      ws.onopen = () => {};
+
+      // Adding admin message to the list of messages
+      ws.onmessage = async (e) => {
+        const list = document.getElementById("messages");
+        const listItems = document.createElement("li");
+        listItems.textContent = e.data;
+        await list.appendChild(listItems);
+      };
+    </script>
+  </body>
+</html>

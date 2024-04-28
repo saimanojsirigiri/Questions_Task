@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Page</title>
+  </head>
+
+  <body>
+    <h1>Messages from Admin</h1>
+
+    <input type="text" placeholder="Enter message" id="message" />
+    <input type="submit" value="Send Message" id="submit" />
+    <input
+      type="button"
+      value="Next Question"
+      id="nextQuestionBtn"
+      onclick="getQuestions()"
+    />
+    <br /><br />
+    <ul id="messages"></ul>
+    <script>
+      const ws = new WebSocket("ws://localhost:8080");
+
+      ws.onopen = (msg) => {
+        console.log("Connected to Admin Server");
+      };
+
+      ws.onmessage = async () => {
+        var btn = document.getElementById("submit");
+        btn.addEventListener("click", () => {
+          var message = document.getElementById("message").value;
+          ws.send(message);
+          window.location.reload();
+        });
+      };
+
+      async function getQuestions() {
+        const response = await fetch(
+          "https://tsk-012.vercel.app/api/randomQuestion"
+        );
+
+        const data = await response.json();
+        if (data.message) {
+          console.log(data.message);
+          ws.send(JSON.stringify(data));
+        } else {
+          const sendingData = {
+            question_id: data._id,
+            que: data.que,
+            opt: data.opt,
+          };
+          console.log(sendingData);
+          ws.send(JSON.stringify(sendingData));
+
+          console.log("New Question");
+        }
+      }
+    </script>
+  </body>
+</html>
